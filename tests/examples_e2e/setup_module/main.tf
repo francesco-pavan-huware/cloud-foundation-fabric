@@ -123,7 +123,6 @@ resource "local_file" "terraform_tfvars" {
     organization_id    = var.organization_id
     project_id         = google_project.project.project_id
     region             = var.region
-    instance_group_id  = google_compute_instance_group.default.id
     service_account = {
       id        = google_service_account.service_account.id
       email     = google_service_account.service_account.email
@@ -141,32 +140,4 @@ resource "local_file" "terraform_tfvars" {
       id        = google_compute_network.network.id
     }
   })
-}
-
-resource "google_compute_instance_group" "default" {
-  project    = google_project.project.project_id
-  depends_on = [google_project_service.project_service]
-  network    = google_compute_network.network.self_link
-  zone       = "${var.region}-b"
-  name       = "e2e-default"
-  instances  = []
-  named_port {
-    name = "http"
-    port = 80
-  }
-  named_port {
-    name = "https"
-    port = 443
-  }
-}
-
-resource "google_compute_subnetwork" "proxy-subnet" {
-  provider      = google-beta
-  ip_cidr_range = "10.0.32.0/24"
-  name          = "e2e-test-proxy-1"
-  network       = google_compute_network.network.name
-  project       = google_project.project.project_id
-  region        = var.region
-  purpose       = "REGIONAL_MANAGED_PROXY"
-  role          = "ACTIVE"
 }

@@ -33,6 +33,43 @@ Due to the complexity of the underlying resources, changes to the configuration 
 - [Outputs](#outputs)
 <!-- END TOC -->
 
+<details>
+  <summary>Fixture</summary>
+
+```hcl
+
+resource "google_compute_instance_group" "default" {
+  project   = var.project_id
+  network   = var.vpc.self_link
+  zone      = var.zone
+  name      = "e2e-default"
+  instances = []
+  named_port {
+    name = "http"
+    port = 80
+  }
+  named_port {
+    name = "https"
+    port = 443
+  }
+  depends_on = [google_compute_subnetwork.proxy-subnet]
+}
+
+resource "google_compute_subnetwork" "proxy-subnet" {
+  provider      = google-beta
+  ip_cidr_range = "10.0.32.0/24"
+  name          = "e2e-test-proxy-1"
+  project       = var.project_id
+  network       = var.vpc.self_link
+  region        = var.region
+  purpose       = "REGIONAL_MANAGED_PROXY"
+  role          = "ACTIVE"
+}
+
+# tftest-fixture
+```
+</details>
+
 ### Minimal HTTP Example
 
 An HTTP load balancer with a backend service pointing to a GCE instance group:
@@ -47,12 +84,12 @@ module "glb-0" {
   backend_service_configs = {
     default = {
       backends = [
-        { backend = var.instance_group_id },
+        { backend = google_compute_instance_group.default.id },
       ]
     }
   }
 }
-# tftest modules=1 resources=5
+# tftest modules=1 resources=5 e2e
 ```
 
 ### Minimal HTTPS examples
