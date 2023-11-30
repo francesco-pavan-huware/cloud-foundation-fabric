@@ -40,15 +40,14 @@ An HTTP load balancer with a backend service pointing to a GCE instance group:
 ```hcl
 module "glb-0" {
   source     = "./fabric/modules/net-lb-app-ext-regional"
-  project_id = "myprj"
+  project_id = var.project_id
   name       = "ralb-test-0"
   vpc        = var.vpc.self_link
   region     = var.region
   backend_service_configs = {
     default = {
       backends = [
-        { backend = "projects/myprj/zones/europe-west8-b/instanceGroups/myig-b" },
-        { backend = "projects/myprj/zones/europe-west8-c/instanceGroups/myig-c" },
+        { backend = var.instance_group_id },
       ]
     }
   }
@@ -65,15 +64,14 @@ An HTTPS load balancer needs a certificate and backends can be HTTP or HTTPS. TH
 ```hcl
 module "ralb-0" {
   source     = "./fabric/modules/net-lb-app-ext-regional"
-  project_id = "myprj"
+  project_id = var.project_id
   name       = "ralb-test-0"
   vpc        = var.vpc.self_link
   region     = var.region
   backend_service_configs = {
     default = {
       backends = [
-        { backend = "projects/myprj/zones/europe-west8-b/instanceGroups/myig-b" },
-        { backend = "projects/myprj/zones/europe-west8-c/instanceGroups/myig-c" },
+        { backend = var.instance_group_id },
       ]
       protocol = "HTTP"
     }

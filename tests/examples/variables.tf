@@ -94,3 +94,7 @@ variable "vpc2" {
 variable "zone" {
   default = "zone"
 }
+
+variable "instance_group_id" {
+  default = "xxx"
+}
